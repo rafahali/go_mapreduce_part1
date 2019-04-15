@@ -89,11 +89,9 @@ func doMap(
 			log.Fatal(err)
 		}
 		enc := json.NewEncoder(file)
-		for j := 0; j < len(hashed_key_value_pairs[i]); j++ {
-			err := enc.Encode(hashed_key_value_pairs[i][j])
-			if err != nil {
-				log.Fatal(err)
-			}
+		err = enc.Encode(hashed_key_value_pairs[i])
+		if err != nil {
+			log.Fatal(err)
 		}
 		file.Close()
 	}
