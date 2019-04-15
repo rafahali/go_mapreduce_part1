@@ -2,6 +2,10 @@ package mapreduce
 
 import (
 	"hash/fnv"
+	"io/ioutil"
+	"log"
+	"os"
+	"encoding/json"
 )
 
 func doMap(
@@ -53,6 +57,46 @@ func doMap(
 	//
 	// Your code here (Part I).
 	//
+	// Open inFile
+	// // Read the contents from inFile
+	// //Give those contents and the inFile name to mapF, returns array of KeyValue
+	// // Create 2D array [nReduce][]
+	// // Iterate through mapF's return, hashing to find the index of our 2D array, add value to that index's array
+	// // For each of the 2D array's rows:
+	// //     Create file with name
+	// //     Encode json for the corresponding values of the id
+	// //     Write to file
+	// //     Close file
+	content, err := ioutil.ReadFile(inFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Remember to use string(content)
+	key_value_pairs := mapF(inFile, string(content))
+	var hashed_key_value_pairs [][]KeyValue
+	for i := 0; i < nReduce; i++ {
+		var a []KeyValue
+		hashed_key_value_pairs = append(hashed_key_value_pairs, a)
+	}
+	for i := 0; i < len(key_value_pairs); i++ {
+		hashvalue := ihash(key_value_pairs[i].Key) % nReduce;
+		hashed_key_value_pairs[hashvalue] = append(hashed_key_value_pairs[hashvalue], key_value_pairs[i])
+	}
+	for i := 0; i < nReduce; i++ {
+		filename := reduceName(jobName, mapTask, i);
+		file, err := os.Create(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		enc := json.NewEncoder(file)
+		for j := 0; j < len(hashed_key_value_pairs[i]); j++ {
+			err := enc.Encode(hashed_key_value_pairs[i][j])
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		file.Close()
+	}
 }
 
 func ihash(s string) int {

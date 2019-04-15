@@ -28,7 +28,7 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 	// All ntasks tasks have to be scheduled on workers. Once all tasks
 	// have completed successfully, schedule() should return.
 	//
-	// Your code here (Part III, Part IV).
+	// Your code here (Part 2, 2B).
 	//
 	fmt.Printf("Schedule: %v done\n", phase)
 }
